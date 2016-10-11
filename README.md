@@ -18,11 +18,11 @@ npm update
 
 Then you can run the following to name the plugin:
 
-gulp rename --name="Name of the Plugin"
+gulp rename --name "Name of the Plugin"
 
 To also rename the containing folder, you'll also need to run:
 
-gulp move --name="Name of the Plugin"
+gulp move --name "Name of the Plugin"
 
 ##Deploy
 
