@@ -1,11 +1,12 @@
 <?php
 /*
-Plugin Name: My Plugin Name
+Plugin Name: WC Deposit Limits
 Plugin URI:
-Description:
+Description: Allows deposits to be enabled for all products once the cart total (including full amount for all products)
+is above a threshold
 Version: 1.0.0
-Author: Author Name
-Author URI: https://authorurl.com
+Author: Bryan Headrick
+Author URI: https://catmanstudios.com
  License: GNU General Public License v3.0
  License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -17,49 +18,37 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-class PluginName {
+class WCDepositLimits {
 
 	/*--------------------------------------------*
 	 * Constants
 	 *--------------------------------------------*/
-	const name = 'My Plugin Name';
-	const slug = 'plugin-name';
+	const name = 'WC Deposit Limits';
+	const slug = 'wc-deposit-limits';
+	const minimum = 4500;
 
 	/**
 	 * Constructor
 	 */
 	function __construct() {
 		//register an activation hook for the plugin
-		register_activation_hook( __FILE__, array( $this, 'install_plugin_name' ) );
+//		register_activation_hook( __FILE__, array( $this, 'install_wc_deposit_limits' ) );
 
 		//Hook up to the init action
-		add_action( 'init', array( $this, 'init_plugin_name' ) );
+		add_action( 'init', array( $this, 'init_wc_deposit_limits' ) );
 	}
 
 	/**
 	 * Runs when the plugin is activated
 	 */
-	function install_plugin_name() {
+	function install_wc_deposit_limits() {
 		// do not generate any output here
 	}
 
 	/**
 	 * Runs when the plugin is initialized
 	 */
-	function init_plugin_name() {
-		// Setup localization
-		load_plugin_textdomain( self::slug, false, dirname( plugin_basename( __FILE__ ) ) . '/lang' );
-		// Load JavaScript and stylesheets
-		$this->register_scripts_and_styles();
-
-		// Register the shortcode [my_shortcode]
-		add_shortcode( 'my_shortcode', array( $this, 'render_shortcode' ) );
-
-		if ( is_admin() ) {
-			//this will run when in the WordPress admin
-		} else {
-			//this will run when on the frontend
-		}
+	function init_wc_deposit_limits() {
 
 		/*
 		 * TODO: Define custom functionality for your plugin here
@@ -67,26 +56,40 @@ class PluginName {
 		 * For more information:
 		 * http://codex.wordpress.org/Plugin_API#Hooks.2C_Actions_and_Filters
 		 */
-		add_action( 'your_action_here', array( $this, 'action_callback_method_name' ) );
-		add_filter( 'your_filter_here', array( $this, 'filter_callback_method_name' ) );
+
+		add_filter( 'pre_option_wc_deposits_default_enabled', array( $this, 'settings_filter' ) );
 	}
 
-	function action_callback_method_name() {
-		// TODO define your action method here
-	}
+	function settings_filter($enabled){
+        global $post;
 
-	function filter_callback_method_name() {
-		// TODO define your filter method here
-	}
 
-	function render_shortcode($atts) {
-		// Extract the attributes
-		extract(shortcode_atts(array(
-			'attr1' => 'foo', //foo is a default value
-			'attr2' => 'bar'
-			), $atts));
-		// you can now access the attribute values using $attr1 and $attr2
-	}
+	    if(is_product()){
+
+            $subtotal = WC()->cart->get_cart_subtotal;
+
+            if($subtotal >= self::minimum){
+                return 'optional';
+            }
+            $items = WC()->cart->cart_contents;
+                $subtotal = 0;
+            foreach($items as $item){
+                if($item['is_deposit']){
+                    $subtotal += $item['full_amount'];
+                }else{
+                    $subtotal += $item['line_total'];
+                }
+            }
+            if($subtotal >= self::minimum){
+                return 'optional';
+            }
+        }
+
+        return $enabled;
+
+    }
+
+
 
 	/**
 	 * Registers and enqueues stylesheets for the administration panel and the
@@ -127,4 +130,4 @@ class PluginName {
 	} // end load_file
 
 } // end class
-new PluginName();
+new WCDepositLimits();

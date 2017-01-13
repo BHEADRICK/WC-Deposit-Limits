@@ -1,35 +1,35 @@
-Plugin Boilerplate
+WC Deposit Limits
 ==========================
 
-This is a basic scaffold for a new WordPress plugin based on the generator found
-at http://wppb.me/
+This is a plugin that gives you a bit more flexibility with the WooCommerce Deposits plugin 
+found here: https://woocommerce.com/products/woocommerce-deposits/
 
-There is also a gulp action to zip the build files (excluding the dev files), name the zip file as the enclosing folder name, and upload it to an S3 bucket
+Out of the box, you can make deposits available for only specific products or for all products. 
+ What I wanted to do was to only allow deposits on a handful of products unconditionally, but
+ also allow deposits for all products once the cart total (counting the full amount, not just the deposit amount)
+  had reached a certain amount
 
 ##Requirements
 
-npm and gulp should be installed globally
+Woocommerce and WooCommerce Deposits
 
 ##Installation
 
-After unzipping or cloning, run the following in Terminal (Mac/Linux) or gitbash (Windows):
+Install like any other WordPress plugin...
 
-npm update
+1. Download the zip file
+1. Upload the zip via your WP Dashboard Plugins->AddNew->Upload Plugin
 
-Then you can run the following to name the plugin:
+Or
 
-gulp rename --name "Name of the Plugin"
+1. Upload the plugin files to the `/wp-content/plugins/plugin-name` directory, or install the plugin through the WordPress plugins screen directly.
+1. Activate the plugin through the 'Plugins' screen in WordPress
+1. Use the Settings->Plugin Name screen to configure the plugin
+1. (Make your instructions match the desired user flow for activating and installing your plugin. Include any steps that might be needed for explanatory purposes)
 
-To also rename the containing folder, you'll also need to run:
+##Configuration
 
-gulp move --name "Name of the Plugin"
+To keep this plugin lean, there is no configuration screen, instead, the cart minimum is hardcoded. 
+You can change the minimum by editing the file on line 28:
 
-##Deploy
-
-To zip up the plugin and upload it to an S3 bucket:
-
-Update the gulpfile with your s3 creds and bucket name, and then run:
-
-gulp deploy
-
-(The zipped file will be located in the plugins directory)
+`const minimum = 4500;`
